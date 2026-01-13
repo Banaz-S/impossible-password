@@ -6,13 +6,17 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: 18px;
+  padding: 20px;
   font-family: Arial, sans-serif;
+  box-sizing: border-box;
 }
 
 .title {
-  font-size: 42px;
-  margin: 0;
+  font-family: "Press Start 2P", cursive;
+  font-size: clamp(20px, 4vw, 32px);
+  text-align: center;
+  line-height: 1.4;
 }
 
 .subtitle {
@@ -34,4 +38,91 @@
 
 .start-button:hover {
   opacity: 0.9;
+}
+
+.name-input {
+  width: 100%;
+  max-width: 320px;
+  padding: 10px 14px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+}
+
+.difficulty-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.difficulty-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #0f0f1a;
+  opacity: 0.6;
+  font-weight: bold;
+}
+
+/* Difficulty colors */
+.difficulty-btn.easy {
+  background-color: #00ff9c;
+}
+
+.difficulty-btn.medium {
+  background-color: #f5c542;
+}
+
+.difficulty-btn.evil {
+  background-color: #ff4d4d;
+}
+
+/* Active state */
+.difficulty-btn.active {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.debug {
+  margin-top: 16px;
+  font-size: 14px;
+  color: #b5b5b5;
+}
+
+.difficulty-info {
+  margin-top: 12px;
+  background-color: #1b1b2f;
+  padding: 14px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #b5b5b5;
+  width: 100%;
+  max-width: 360px;
+  text-align: left;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  .start-button {
+    font-size: 16px;
+    padding: 10px 24px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .subtitle {
+    font-size: 15px;
+    text-align: center;
+  }
+
+  .difficulty-btn {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
 }
