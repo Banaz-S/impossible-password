@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { playRuleSuccessSound, playRuleBreakSound } from "../../../utils/sound";
-
+import "./RuleItem.css";
 function RuleItem({ text, state }) {
   const prevState = useRef(state);
   const isSatisfied = state === "satisfied-visible";

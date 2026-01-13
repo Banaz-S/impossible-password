@@ -1,0 +1,55 @@
+.exit-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+}
+
+.exit-modal {
+  background: #0f0f1a;
+  border: 2px solid #ff4d4d;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  color: white;
+  font-family: "Press Start 2P", cursive;
+  max-width: 320px;
+}
+
+.exit-modal h2 {
+  margin-bottom: 10px;
+  color: #ff4d4d;
+}
+
+.exit-modal p {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 20px;
+}
+
+.exit-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.exit-actions button {
+  padding: 10px 14px;
+  border-radius: 3px;
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+}
+
+.continue-btn {
+  background: #00ff9c;
+  color: black;
+}
+
+.exit-btn {
+  background: #ff4d4d;
+  color: black;
+}

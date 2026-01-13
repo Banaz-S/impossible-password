@@ -8,9 +8,12 @@ import WinScreen from "../WinScreen/WinScreen";
 import { playRuleBreakSound } from "../../utils/sound";
 import { playGameOverSound } from "../../utils/sound";
 import { playGameWinSound } from "../../utils/sound";
+// import { saveScore } from "../../utils/ranking";
 import CountdownOverlay from "./CountdownOverlay/CountdownOverlay";
 import GameOverScreen from "../GameOverScreen/GameOverScreen";
-
+import ExitConfirmModal from "../ExitConfirmModal/ExitConfirmModal";
+import { saveScoreToSupabase } from "../../services/rankingService";
+import { calculateFinalScore } from "../../utils/score";
 import { RULES } from "../../data/rules";
 
 function Game({ playerName, difficulty, onExit }) {
@@ -20,13 +23,13 @@ function Game({ playerName, difficulty, onExit }) {
   const [password, setPassword] = useState("");
   const [hasWon, setHasWon] = useState(false);
   const [score, setScore] = useState(0);
-  const prevRuleStatesRef = useRef([]);
   const breakSoundCooldownRef = useRef(false);
   const [hasLost, setHasLost] = useState(false);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
 
   const getInitialTime = () => {
     if (difficulty === "medium") return 90; // seconds
-    if (difficulty === "evil") return 60;
+    if (difficulty === "evil") return 120;
     return null; // easy = unlimited
   };
 
@@ -35,7 +38,7 @@ function Game({ playerName, difficulty, onExit }) {
   const passwordInputRef = useRef(null);
 
   const formatTime = (seconds) => {
-    if (seconds === null) return "∞";
+    if (seconds === null) return "Unlimite";
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m}:${s.toString().padStart(2, "0")}`;
@@ -79,6 +82,12 @@ function Game({ playerName, difficulty, onExit }) {
   useEffect(() => {
     if (hasLost) {
       playGameOverSound();
+      saveScoreToSupabase({
+        name: playerName,
+        difficulty,
+        score,
+        timeLeft: 0,
+      });
     }
   }, [hasLost]);
 
@@ -86,9 +95,29 @@ function Game({ playerName, difficulty, onExit }) {
   // PLAY WIN SOUND ON VICTORY
   //---------------------
   useEffect(() => {
-    if (hasWon) {
-      playGameWinSound();
-    }
+    if (!hasWon) return;
+
+    const satisfiedRules = ruleStates.filter(
+      (r) => r.state !== "failed"
+    ).length;
+
+    const finalScore = calculateFinalScore({
+      satisfiedRules,
+      difficulty,
+      timeLeft,
+    });
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setScore(finalScore);
+
+    playGameWinSound();
+
+    saveScoreToSupabase({
+      name: playerName,
+      difficulty,
+      score: finalScore,
+      timeLeft,
+    });
   }, [hasWon]);
 
   //---------------------
@@ -180,6 +209,7 @@ function Game({ playerName, difficulty, onExit }) {
     if (difficulty === "medium") multiplier = 1.5;
     if (difficulty === "evil") multiplier = 2;
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setScore(Math.floor(satisfiedCount * 10 * multiplier));
 
     if (
@@ -222,39 +252,55 @@ function Game({ playerName, difficulty, onExit }) {
   // GAME UI
   // --------------------
   return (
-    <div className={`game-screen ${!countdownDone ? "game-locked" : ""}`}>
-      {/* 🔒 Countdown overlay — MUST BE FIRST */}
-      {!countdownDone && (
-        <CountdownOverlay
-          onFinish={() => {
-            setCountdownDone(true);
-            setTimeout(() => {
-              passwordInputRef.current?.focus();
-            }, 100);
-          }}
+    <>
+      {showExitConfirm && (
+        <ExitConfirmModal
+          onConfirm={onExit}
+          onCancel={() => setShowExitConfirm(false)}
         />
       )}
 
-      <GameHeader
-        playerName={playerName}
-        difficulty={difficulty}
-        timeLeft={formatTime(timeLeft)}
-        score={score}
-      />
+      <div
+        className={`game-screen ${
+          !countdownDone || showExitConfirm ? "game-locked" : ""
+        }`}
+      >
+        {/* 🔒 Countdown overlay — MUST BE FIRST */}
+        {!countdownDone && (
+          <CountdownOverlay
+            onFinish={() => {
+              setCountdownDone(true);
+              setTimeout(() => {
+                passwordInputRef.current?.focus();
+              }, 100);
+            }}
+          />
+        )}
 
-      <PasswordInput
-        ref={passwordInputRef}
-        password={password}
-        setPassword={setPassword}
-        disabled={!countdownDone || hasLost}
-      />
+        <GameHeader
+          playerName={playerName}
+          difficulty={difficulty}
+          timeLeft={formatTime(timeLeft)}
+          score={score}
+        />
 
-      <RulesBoard rules={ruleStates} />
+        <PasswordInput
+          ref={passwordInputRef}
+          password={password}
+          setPassword={setPassword}
+          disabled={!countdownDone || hasLost}
+        />
 
-      <button className="exit-button" onClick={onExit}>
-        Exit Game
-      </button>
-    </div>
+        <RulesBoard rules={ruleStates} />
+
+        <button
+          className="exit-button"
+          onClick={() => setShowExitConfirm(true)}
+        >
+          Exit Game
+        </button>
+      </div>
+    </>
   );
 }
 

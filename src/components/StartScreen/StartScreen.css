@@ -13,7 +13,7 @@ body {
   justify-content: center;
   gap: 18px;
   padding: 20px;
-  font-family: Arial, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   box-sizing: border-box;
 }
 
@@ -119,6 +119,19 @@ body {
   background-color: #555;
   cursor: not-allowed;
   opacity: 0.9;
+}
+
+.dev-credit {
+  margin-top: 20px;
+  font-size: 16px;
+  opacity: 0.6;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+}
+
+.dev-credit a {
+  color: #ffffff;
+  text-decoration: none;
 }
 
 /* Tablet */

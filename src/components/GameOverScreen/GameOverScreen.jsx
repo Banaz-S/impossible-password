@@ -1,4 +1,5 @@
 import "./GameOverScreen.css";
+import RankingBoard from "../RankingBoard/RankingBoard";
 
 function GameOverScreen({ playerName, score, onRestart }) {
   return (

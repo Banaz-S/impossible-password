@@ -1,0 +1,13 @@
+.rule-item {
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .rule-item {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+}

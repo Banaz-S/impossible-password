@@ -1,0 +1,126 @@
+.ranking-board {
+  width: 100%;
+  max-width: 500px;
+  margin-top: 20px;
+  padding: 16px;
+  background: #0f0f1a;
+  border: 2px solid #00ff9c;
+  border-radius: 12px;
+  font-family: "Press Start 2P", cursive;
+}
+
+.ranking-board h2 {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+/* =====================
+   GRID HEADER & ROWS
+===================== */
+.ranking-header,
+.ranking-board li {
+  display: grid;
+  grid-template-columns: 40px 1fr 80px 80px 90px;
+  align-items: center;
+  gap: 8px;
+}
+
+.ranking-header {
+  font-size: 14px;
+  opacity: 0.6;
+  margin-bottom: 8px;
+}
+
+.ranking-board ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ranking-board li {
+  padding: 8px;
+  border-bottom: 1px solid #222;
+}
+
+/* =====================
+   CELL STYLES
+===================== */
+.rank {
+  color: #ffd700;
+}
+
+.diff.easy {
+  color: #00ff9c;
+}
+
+.diff.medium {
+  color: #ffd54f;
+}
+
+.diff.evil {
+  color: #ff4d4d;
+}
+
+.score {
+  color: white;
+  padding-left: 20px;
+}
+
+.time {
+  font-size: 12px;
+  opacity: 0.8;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* =====================
+   STATES
+===================== */
+.empty {
+  text-align: center;
+  font-size: 13px;
+  opacity: 0.7;
+  margin-top: 20px;
+}
+
+.empty.error {
+  color: #ff6b6b;
+}
+
+/* =====================
+   TABLET
+===================== */
+@media (max-width: 1024px) {
+  .ranking-header,
+  .ranking-board li {
+    grid-template-columns: 32px 1fr 65px 65px 75px;
+    font-size: 12px;
+  }
+
+  .ranking-board {
+    padding: 14px;
+  }
+}
+
+/* =====================
+   MOBILE
+===================== */
+@media (max-width: 768px) {
+  .ranking-header,
+  .ranking-board li {
+    grid-template-columns: 28px 1fr 55px 55px 65px;
+    font-size: 11px;
+  }
+
+  .ranking-board {
+    padding: 12px;
+  }
+
+  .ranking-board h2 {
+    font-size: 14px;
+  }
+
+  .time {
+    font-size: 11px;
+  }
+}

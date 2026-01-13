@@ -44,3 +44,11 @@
   opacity: 0.9;
   transition: opacity 0.3s ease;
 }
+
+.ranking-header {
+  display: grid;
+  grid-template-columns: 40px 1fr 80px 80px 90px;
+  font-size: 11px;
+  opacity: 0.6;
+  margin-bottom: 8px;
+}

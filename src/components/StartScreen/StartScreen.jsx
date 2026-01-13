@@ -20,9 +20,27 @@ function StartScreen({
       rules: "More logic, more restrictions",
     },
     evil: {
-      time: "1 minutes",
+      time: "2 minutes",
       rules: "Precise, chaotic, and cruel 😈",
     },
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleStart();
+    }
+  };
+
+  const handleStart = () => {
+    const trimmedName = playerName.trim();
+
+    if (trimmedName.length < 3 || trimmedName.includes(" ")) {
+      nameInputRef.current?.focus();
+      return;
+    }
+
+    onStart(trimmedName, difficulty);
   };
 
   return (
@@ -40,6 +58,7 @@ function StartScreen({
         placeholder="Enter your name"
         className="name-input"
         value={playerName}
+        onKeyDown={handleKeyDown}
         onChange={(e) => {
           const value = e.target.value;
 
@@ -49,7 +68,7 @@ function StartScreen({
           }
         }}
       />
-
+      <p className="subtitle">Choose your difficulty level:</p>
       {/* Difficulty Selector */}
       <div className="difficulty-group">
         <button
@@ -102,6 +121,12 @@ function StartScreen({
       >
         Start Game
       </button>
+      <p className="dev-credit">
+        Developed by{" "}
+        <a href="https://www.linkedin.com/in/banaz-sleman-b6b181256/">
+          <strong>Banaz Sleman</strong>
+        </a>
+      </p>
     </div>
   );
 }

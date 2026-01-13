@@ -1,4 +1,5 @@
 import "./WinScreen.css";
+import RankingBoard from "../RankingBoard/RankingBoard";
 
 function WinScreen({ playerName, difficulty, password, score, onRestart }) {
   return (
@@ -16,6 +17,7 @@ function WinScreen({ playerName, difficulty, password, score, onRestart }) {
       <p className="win-text">
         Final Score: <strong>{score}</strong>
       </p>
+      <RankingBoard />
 
       <p className="win-password">
         Final Password:

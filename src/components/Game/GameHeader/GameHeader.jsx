@@ -3,7 +3,9 @@ import "./GameHeader.css";
 function GameHeader({ playerName, difficulty, timeLeft, score }) {
   return (
     <div className="game-header">
-      <div className="header-item player">👤 {playerName}</div>
+      <div className="header-item player">
+        👤 {playerName[0].toUpperCase() + playerName.slice(1)}
+      </div>
 
       <div className={`header-item difficulty ${difficulty}`}>
         🎯 {difficulty.toUpperCase()}
