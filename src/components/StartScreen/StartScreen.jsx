@@ -40,7 +40,14 @@ function StartScreen({
         placeholder="Enter your name"
         className="name-input"
         value={playerName}
-        onChange={(e) => setPlayerName(e.target.value)}
+        onChange={(e) => {
+          const value = e.target.value;
+
+          // Allow only letters & numbers, no spaces
+          if (/^[a-zA-Z0-9]*$/.test(value)) {
+            setPlayerName(value);
+          }
+        }}
       />
 
       {/* Difficulty Selector */}
@@ -84,9 +91,9 @@ function StartScreen({
       </div>
 
       <button
-        className={`start-button ${!playerName ? "disabled" : ""}`}
+        className={`start-button ${playerName.length < 3 ? "disabled" : ""}`}
         onClick={() => {
-          if (!playerName) {
+          if (playerName.length < 3) {
             nameInputRef.current.focus();
             return;
           }
