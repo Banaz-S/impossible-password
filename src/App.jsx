@@ -19,11 +19,11 @@ function App() {
 
   return (
     <StartScreen
-      onStart={(name, level) => {
-        setPlayerName(name);
-        setDifficulty(level);
-        setScreen("game");
-      }}
+      playerName={playerName}
+      setPlayerName={setPlayerName}
+      difficulty={difficulty}
+      setDifficulty={setDifficulty}
+      onStart={() => setScreen("game")}
     />
   );
 }

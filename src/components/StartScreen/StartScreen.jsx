@@ -1,9 +1,13 @@
+import { useRef } from "react";
 import "./StartScreen.css";
-import { useState, useRef } from "react";
 
-function StartScreen({ onStart }) {
-  const [playerName, setPlayerName] = useState("");
-  const [difficulty, setDifficulty] = useState("easy");
+function StartScreen({
+  playerName,
+  setPlayerName,
+  difficulty,
+  setDifficulty,
+  onStart,
+}) {
   const nameInputRef = useRef(null);
 
   const difficultyInfo = {
@@ -86,7 +90,7 @@ function StartScreen({ onStart }) {
             nameInputRef.current.focus();
             return;
           }
-          onStart(playerName, difficulty);
+          onStart();
         }}
       >
         Start Game
