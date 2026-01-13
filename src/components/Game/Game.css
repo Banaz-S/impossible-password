@@ -38,3 +38,9 @@
 .exit-button:hover {
   opacity: 0.9;
 }
+
+.game-locked {
+  pointer-events: none;
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+}

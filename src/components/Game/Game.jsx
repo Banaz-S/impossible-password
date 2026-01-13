@@ -6,6 +6,7 @@ import PasswordInput from "./PasswordInput/PasswordInput";
 import RulesBoard from "./RulesBoard/RulesBoard";
 import WinScreen from "../WinScreen/WinScreen";
 import { playRuleBreakSound } from "../../utils/sound";
+import CountdownOverlay from "./CountdownOverlay/CountdownOverlay";
 
 import { RULES } from "../../data/rules";
 
@@ -18,6 +19,7 @@ function Game({ playerName, difficulty, onExit }) {
   const [score, setScore] = useState(0);
   const prevRuleStatesRef = useRef([]);
   const breakSoundCooldownRef = useRef(false);
+  const [countdownDone, setCountdownDone] = useState(false);
 
   const passwordInputRef = useRef(null);
 
@@ -148,7 +150,19 @@ function Game({ playerName, difficulty, onExit }) {
   // GAME UI
   // --------------------
   return (
-    <div className="game-screen">
+    <div className={`game-screen ${!countdownDone ? "game-locked" : ""}`}>
+      {/* 🔒 Countdown overlay — MUST BE FIRST */}
+      {!countdownDone && (
+        <CountdownOverlay
+          onFinish={() => {
+            setCountdownDone(true);
+            setTimeout(() => {
+              passwordInputRef.current?.focus();
+            }, 100);
+          }}
+        />
+      )}
+
       <GameHeader
         playerName={playerName}
         difficulty={difficulty}
@@ -160,7 +174,7 @@ function Game({ playerName, difficulty, onExit }) {
         ref={passwordInputRef}
         password={password}
         setPassword={setPassword}
-        disabled={false}
+        disabled={!countdownDone}
       />
 
       <RulesBoard rules={ruleStates} />

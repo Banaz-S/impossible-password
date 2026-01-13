@@ -56,11 +56,6 @@ export const RULES = {
       validate: (pw) => EMOJI_REGEX.test(pw),
     },
     {
-      id: "no_password",
-      text: "Must not include the word 'password'",
-      validate: (pw) => !pw.toLowerCase().includes("password"),
-    },
-    {
       id: "start_letter",
       text: "Must start with a letter",
       validate: (pw) => /^[A-Za-z]/.test(pw),
@@ -124,11 +119,6 @@ export const RULES = {
       id: "color",
       text: "Must include a color name",
       validate: (pw) => COLORS.some((c) => pw.toLowerCase().includes(c)),
-    },
-    {
-      id: "no_spaces",
-      text: "Must not include spaces",
-      validate: (pw) => !/\s/.test(pw),
     },
   ],
 
@@ -199,13 +189,8 @@ export const RULES = {
     },
     {
       id: "no_x",
-      text: "Must not include the letter x",
-      validate: (pw) => !/[xX]/.test(pw),
-    },
-    {
-      id: "no_spaces",
-      text: "Must not include spaces",
-      validate: (pw) => !/\s/.test(pw),
+      text: "Must include the letter x",
+      validate: (pw) => /[xX]/.test(pw),
     },
     {
       id: "win",

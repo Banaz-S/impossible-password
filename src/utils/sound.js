@@ -20,3 +20,15 @@ export const playRuleBreakSound = () => {
   breakAudio.currentTime = 0;
   breakAudio.play().catch(() => {});
 };
+
+let countdownAudio;
+
+export const playCountdownSound = () => {
+  if (!countdownAudio) {
+    countdownAudio = new Audio("/src/assets/sounds/countdown.mp3");
+    countdownAudio.volume = 0.5;
+  }
+
+  countdownAudio.currentTime = 0;
+  countdownAudio.play().catch(() => {});
+};
