@@ -1,7 +1,12 @@
 import "./Game.css";
 import GameHeader from "./GameHeader/GameHeader";
+import { useState, useRef } from "react";
+import PasswordInput from "./PasswordInput/PasswordInput";
 
 function Game({ playerName, difficulty, onExit }) {
+  const [password, setPassword] = useState("");
+  const passwordInputRef = useRef(null);
+
   const timeLeft =
     difficulty === "easy" ? "∞" : difficulty === "medium" ? "02:00" : "01:30";
 
@@ -9,22 +14,21 @@ function Game({ playerName, difficulty, onExit }) {
 
   return (
     <div className="game-screen">
-      <GameHeader difficulty={difficulty} timeLeft={timeLeft} score={score} />
+      <GameHeader
+        playerName={playerName}
+        difficulty={difficulty}
+        timeLeft={timeLeft}
+        score={score}
+      />
 
       <h1 className="game-title">Game Started 🎮</h1>
 
-      <div className="game-info">
-        <p>
-          👤 <strong>Player:</strong> {playerName}
-        </p>
-        <p>
-          🎯 <strong>Difficulty:</strong> {difficulty}
-        </p>
-      </div>
-
-      <p className="game-placeholder">
-        (Game rules and password input will appear here)
-      </p>
+      <PasswordInput
+        ref={passwordInputRef}
+        password={password}
+        setPassword={setPassword}
+        disabled={false}
+      />
 
       <button className="exit-button" onClick={onExit}>
         Exit Game

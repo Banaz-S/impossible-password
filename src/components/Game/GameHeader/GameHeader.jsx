@@ -1,19 +1,17 @@
 import "./GameHeader.css";
 
-function GameHeader({ difficulty, timeLeft, score }) {
+function GameHeader({ playerName, difficulty, timeLeft, score }) {
   return (
     <div className="game-header">
-      <div className="header-item">
-        ⏱ <strong>Time:</strong> {timeLeft}
-      </div>
-
-      <div className="header-item">
-        ⭐ <strong>Score:</strong> {score}
-      </div>
+      <div className="header-item player">👤 {playerName}</div>
 
       <div className={`header-item difficulty ${difficulty}`}>
         🎯 {difficulty.toUpperCase()}
       </div>
+
+      <div className="header-item">⏱ {timeLeft}</div>
+
+      <div className="header-item">⭐ {score}</div>
     </div>
   );
 }
