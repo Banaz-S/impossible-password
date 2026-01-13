@@ -16,11 +16,11 @@ function StartScreen({
       rules: "Simple and forgiving rules",
     },
     medium: {
-      time: "2 minutes",
+      time: "1.5 minutes",
       rules: "More logic, more restrictions",
     },
     evil: {
-      time: "1.5 minutes",
+      time: "1 minutes",
       rules: "Precise, chaotic, and cruel 😈",
     },
   };

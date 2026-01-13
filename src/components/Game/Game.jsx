@@ -2,15 +2,19 @@ import "./Game.css";
 import GameHeader from "./GameHeader/GameHeader";
 import { useState, useRef } from "react";
 import PasswordInput from "./PasswordInput/PasswordInput";
+import RulesBoard from "./RulesBoard/RulesBoard";
+import { RULES } from "../../data/rules";
 
 function Game({ playerName, difficulty, onExit }) {
   const [password, setPassword] = useState("");
   const passwordInputRef = useRef(null);
 
   const timeLeft =
-    difficulty === "easy" ? "∞" : difficulty === "medium" ? "02:00" : "01:30";
+    difficulty === "easy" ? "∞" : difficulty === "medium" ? "01:30" : "01:00";
 
   const score = 0;
+
+  const rules = RULES[difficulty];
 
   return (
     <div className="game-screen">
@@ -29,6 +33,8 @@ function Game({ playerName, difficulty, onExit }) {
         setPassword={setPassword}
         disabled={false}
       />
+
+      <RulesBoard rules={rules} password={password} />
 
       <button className="exit-button" onClick={onExit}>
         Exit Game
