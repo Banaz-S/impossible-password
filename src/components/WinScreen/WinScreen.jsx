@@ -3,7 +3,7 @@ import "./WinScreen.css";
 function WinScreen({ playerName, difficulty, password, score, onRestart }) {
   return (
     <div className="win-screen">
-      <h1 className="win-title">🎉 YOU WIN 🎉</h1>
+      <h1 className="win-title">🎉YOU WIN🎉</h1>
 
       <p className="win-text">
         Well done <strong>{playerName}</strong>!

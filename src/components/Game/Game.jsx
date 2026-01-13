@@ -1,37 +1,118 @@
 import "./Game.css";
-import GameHeader from "./GameHeader/GameHeader";
 import { useState, useRef, useEffect } from "react";
+
+import GameHeader from "./GameHeader/GameHeader";
 import PasswordInput from "./PasswordInput/PasswordInput";
 import RulesBoard from "./RulesBoard/RulesBoard";
-import { RULES } from "../../data/rules";
 import WinScreen from "../WinScreen/WinScreen";
+import { playRuleBreakSound } from "../../utils/sound";
+
+import { RULES } from "../../data/rules";
 
 function Game({ playerName, difficulty, onExit }) {
+  // --------------------
+  // STATE
+  // --------------------
+  const [password, setPassword] = useState("");
+  const [hasWon, setHasWon] = useState(false);
+  const [score, setScore] = useState(0);
+  const prevRuleStatesRef = useRef([]);
+  const breakSoundCooldownRef = useRef(false);
+
+  const passwordInputRef = useRef(null);
+
+  // --------------------
+  // TIME (placeholder)
+  // --------------------
+  const timeLeft =
+    difficulty === "easy" ? "∞" : difficulty === "medium" ? "01:30" : "01:00";
+
+  // --------------------
+  // RULE STATES
+  // --------------------
+  const [ruleStates, setRuleStates] = useState(() =>
+    RULES[difficulty].map((rule) => ({
+      ...rule,
+      state: "failed", // failed | satisfied-visible | satisfied-hidden
+    }))
+  );
+
+  // --------------------
+  // FOCUS PASSWORD INPUT ON GAME START
+  // --------------------
   useEffect(() => {
     passwordInputRef.current?.focus();
   }, []);
 
-  const [password, setPassword] = useState("");
-  const passwordInputRef = useRef(null);
-  const [hasWon, setHasWon] = useState(false);
-  const [score, setScore] = useState(0);
-
-  const timeLeft =
-    difficulty === "easy" ? "∞" : difficulty === "medium" ? "01:30" : "01:00";
-
-  const rules = RULES[difficulty];
-
+  // --------------------
+  // UPDATE RULE STATES BASED ON PASSWORD
+  // --------------------
   useEffect(() => {
-    const allSatisfied = rules.every((rule) => rule.validate(password));
+    setRuleStates((prevRules) => {
+      const updatedRules = prevRules.map((rule) => {
+        const isValid = rule.validate(password);
 
-    if (allSatisfied && rules.length > 0) {
-      setHasWon(true);
-    }
-  }, [password, rules]);
+        if (isValid && rule.state === "failed") {
+          return { ...rule, state: "satisfied-visible" };
+        }
 
+        if (!isValid && rule.state !== "failed") {
+          return { ...rule, state: "failed" };
+        }
+
+        return rule;
+      });
+
+      // 🔊 debounced break sound
+      if (!breakSoundCooldownRef.current) {
+        const hasBrokenRule = prevRules.some((prevRule, index) => {
+          const nextRule = updatedRules[index];
+          return prevRule.state !== "failed" && nextRule.state === "failed";
+        });
+
+        if (hasBrokenRule) {
+          playRuleBreakSound();
+          breakSoundCooldownRef.current = true;
+
+          setTimeout(() => {
+            breakSoundCooldownRef.current = false;
+          }, 300);
+        }
+      }
+
+      return updatedRules;
+    });
+  }, [password]);
+
+  // --------------------
+  // HIDE RULE AFTER ANIMATION DELAY
+  // --------------------
   useEffect(() => {
-    const satisfiedCount = rules.filter((rule) =>
-      rule.validate(password)
+    const timers = [];
+
+    ruleStates.forEach((rule) => {
+      if (rule.state === "satisfied-visible") {
+        const timer = setTimeout(() => {
+          setRuleStates((prev) =>
+            prev.map((r) =>
+              r.id === rule.id ? { ...r, state: "satisfied-hidden" } : r
+            )
+          );
+        }, 1000); // visible for 1 second
+
+        timers.push(timer);
+      }
+    });
+
+    return () => timers.forEach(clearTimeout);
+  }, [ruleStates]);
+
+  // --------------------
+  // SCORE & WIN CONDITION
+  // --------------------
+  useEffect(() => {
+    const satisfiedCount = ruleStates.filter(
+      (r) => r.state !== "failed"
     ).length;
 
     let multiplier = 1;
@@ -39,8 +120,18 @@ function Game({ playerName, difficulty, onExit }) {
     if (difficulty === "evil") multiplier = 2;
 
     setScore(Math.floor(satisfiedCount * 10 * multiplier));
-  }, [password, rules, difficulty]);
 
+    if (
+      ruleStates.length > 0 &&
+      ruleStates.every((r) => r.state !== "failed")
+    ) {
+      setHasWon(true);
+    }
+  }, [ruleStates, difficulty]);
+
+  // --------------------
+  // WIN SCREEN
+  // --------------------
   if (hasWon) {
     return (
       <WinScreen
@@ -53,6 +144,9 @@ function Game({ playerName, difficulty, onExit }) {
     );
   }
 
+  // --------------------
+  // GAME UI
+  // --------------------
   return (
     <div className="game-screen">
       <GameHeader
@@ -62,8 +156,6 @@ function Game({ playerName, difficulty, onExit }) {
         score={score}
       />
 
-      <h1 className="game-title">Game Started 🎮</h1>
-
       <PasswordInput
         ref={passwordInputRef}
         password={password}
@@ -71,7 +163,7 @@ function Game({ playerName, difficulty, onExit }) {
         disabled={false}
       />
 
-      <RulesBoard rules={rules} password={password} />
+      <RulesBoard rules={ruleStates} />
 
       <button className="exit-button" onClick={onExit}>
         Exit Game

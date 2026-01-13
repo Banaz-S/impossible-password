@@ -1,16 +1,15 @@
+import { AnimatePresence } from "framer-motion";
 import RuleItem from "./RuleItem";
 import "./RulesBoard.css";
 
-function RulesBoard({ rules, password }) {
+function RulesBoard({ rules }) {
   return (
     <div className="rules-list">
-      {rules.map((rule) => (
-        <RuleItem
-          key={rule.id}
-          text={rule.text}
-          satisfied={rule.validate(password)}
-        />
-      ))}
+      {rules
+        .filter((r) => r.state !== "satisfied-hidden")
+        .map((rule) => (
+          <RuleItem key={rule.id} text={rule.text} state={rule.state} />
+        ))}
     </div>
   );
 }
