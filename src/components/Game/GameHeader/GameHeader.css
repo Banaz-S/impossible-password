@@ -1,0 +1,29 @@
+.game-header {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #1b1b2f;
+  padding: 14px 18px;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+.header-item {
+  font-size: 14px;
+  color: white;
+}
+
+/* Difficulty colors */
+.header-item.difficulty.easy {
+  color: #00ff9c;
+}
+
+.header-item.difficulty.medium {
+  color: #f5c542;
+}
+
+.header-item.difficulty.evil {
+  color: #ff4d4d;
+}
