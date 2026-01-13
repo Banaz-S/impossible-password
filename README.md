@@ -1,4 +1,4 @@
-# 🎮 Password Chaos — A Skill-Based Password Game
+# 🎮 Impossible Password — A Skill-Based Password Game
 
 Password Chaos is an interactive web-based game that challenges players to create **valid passwords under pressure** by satisfying increasingly complex rules — all while racing against time.
 
