@@ -1,9 +1,10 @@
-import { useState } from "react";
 import "./StartScreen.css";
+import { useState, useRef } from "react";
 
-function StartScreen() {
+function StartScreen({ onStart }) {
   const [playerName, setPlayerName] = useState("");
   const [difficulty, setDifficulty] = useState("easy");
+  const nameInputRef = useRef(null);
 
   const difficultyInfo = {
     easy: {
@@ -30,6 +31,7 @@ function StartScreen() {
 
       {/* Player Name */}
       <input
+        ref={nameInputRef}
         type="text"
         placeholder="Enter your name"
         className="name-input"
@@ -77,7 +79,18 @@ function StartScreen() {
         </p>
       </div>
 
-      <button className="start-button">Start Game</button>
+      <button
+        className={`start-button ${!playerName ? "disabled" : ""}`}
+        onClick={() => {
+          if (!playerName) {
+            nameInputRef.current.focus();
+            return;
+          }
+          onStart(playerName, difficulty);
+        }}
+      >
+        Start Game
+      </button>
     </div>
   );
 }
