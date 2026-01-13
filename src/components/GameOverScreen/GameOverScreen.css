@@ -1,0 +1,22 @@
+.game-over-screen {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle, #1a0000, #000);
+  color: #ff4d4d;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  z-index: 2000;
+  font-family: "Press Start 2P", cursive;
+}
+
+.game-over-screen button {
+  padding: 12px 20px;
+  background: #ff4d4d;
+  border: none;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+}

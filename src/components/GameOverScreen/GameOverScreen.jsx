@@ -1,0 +1,15 @@
+import "./GameOverScreen.css";
+
+function GameOverScreen({ playerName, score, onRestart }) {
+  return (
+    <div className="game-over-screen">
+      <h1>💀 GAME OVER 💀</h1>
+      <p>{playerName}, time's up!</p>
+      <p className="final-score">Score: {score}</p>
+
+      <button onClick={onRestart}>Try Again</button>
+    </div>
+  );
+}
+
+export default GameOverScreen;
