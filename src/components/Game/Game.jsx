@@ -15,6 +15,7 @@ import ExitConfirmModal from "../ExitConfirmModal/ExitConfirmModal";
 import { saveScoreToSupabase } from "../../services/rankingService";
 import { calculateFinalScore } from "../../utils/score";
 import { RULES } from "../../data/rules";
+import { saveFailedAttempt } from "../../services/attemptsService";
 
 function Game({ playerName, difficulty, onExit }) {
   // --------------------
@@ -83,6 +84,13 @@ function Game({ playerName, difficulty, onExit }) {
   useEffect(() => {
     if (hasLost) {
       playGameOverSound();
+      saveFailedAttempt({
+        name: playerName,
+        difficulty,
+        score,
+        timeLeft: 0,
+        reason: "time_up",
+      });
     }
   }, [hasLost]);
 
