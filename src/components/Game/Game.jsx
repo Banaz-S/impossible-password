@@ -26,6 +26,7 @@ function Game({ playerName, difficulty, onExit }) {
   const breakSoundCooldownRef = useRef(false);
   const [hasLost, setHasLost] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [rankingVersion, setRankingVersion] = useState(0);
 
   const getInitialTime = () => {
     if (difficulty === "medium") return 90; // seconds
@@ -82,12 +83,6 @@ function Game({ playerName, difficulty, onExit }) {
   useEffect(() => {
     if (hasLost) {
       playGameOverSound();
-      saveScoreToSupabase({
-        name: playerName,
-        difficulty,
-        score,
-        timeLeft: 0,
-      });
     }
   }, [hasLost]);
 
@@ -117,6 +112,8 @@ function Game({ playerName, difficulty, onExit }) {
       difficulty,
       score: finalScore,
       timeLeft,
+    }).then(() => {
+      setRankingVersion((v) => v + 1);
     });
   }, [hasWon]);
 
@@ -243,6 +240,7 @@ function Game({ playerName, difficulty, onExit }) {
         difficulty={difficulty}
         password={password}
         score={score}
+        rankingVersion={rankingVersion}
         onRestart={onExit}
       />
     );

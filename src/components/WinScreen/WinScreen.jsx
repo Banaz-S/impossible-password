@@ -1,7 +1,14 @@
 import "./WinScreen.css";
 import RankingBoard from "../RankingBoard/RankingBoard";
 
-function WinScreen({ playerName, difficulty, password, score, onRestart }) {
+function WinScreen({
+  playerName,
+  difficulty,
+  password,
+  score,
+  rankingVersion,
+  onRestart,
+}) {
   return (
     <div className="win-screen">
       <h1 className="win-title">🎉YOU WIN🎉</h1>
@@ -17,7 +24,7 @@ function WinScreen({ playerName, difficulty, password, score, onRestart }) {
       <p className="win-text">
         Final Score: <strong>{score}</strong>
       </p>
-      <RankingBoard />
+      <RankingBoard refreshKey={rankingVersion} />
 
       <p className="win-password">
         Final Password:
