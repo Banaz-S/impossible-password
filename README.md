@@ -1,16 +1,95 @@
-# React + Vite
+# 🎮 Impossible Password — A Skill-Based Password Game
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Password Chaos is an interactive web-based game that challenges players to create **valid passwords under pressure** by satisfying increasingly complex rules — all while racing against time.
 
-Currently, two official plugins are available:
+The game combines **logic, speed, and creativity**, featuring a global leaderboard powered by **Supabase**.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🚀 Live Demo
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+🔗 **Play the game:**  
+👉 https://impossible-password.vercel.app/
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🧠 Game Concept
+
+Players must create a password that satisfies **dynamic rule sets** depending on the selected difficulty:
+
+- 🟢 **Easy** — Logic & pattern recognition  
+- 🟡 **Medium** — Time pressure & precision  
+- 🔴 **Evil** — Advanced constraints & extreme focus  
+
+Each rule is validated **in real time**, with visual feedback and smooth animations.
+
+---
+
+## 🏆 Scoring System
+
+Scores are calculated based on:
+
+- ✅ Number of satisfied rules  
+- 🎯 Difficulty multiplier  
+- ⏱️ **Remaining time bonus** (Medium & Evil only)
+
+This ensures:
+
+- Fair competition  
+- Skill-based ranking  
+- Meaningful leaderboards  
+
+---
+
+## 🌍 Global Leaderboard
+
+- Online leaderboard using **Supabase**
+- Persistent scores across devices
+- Tie-breaking based on remaining time
+- Fully responsive design
+
+---
+
+## ✨ Features
+
+- 🎮 Interactive password challenge
+- ⏱️ Countdown & time-based gameplay
+- 🔊 Sound effects (countdown, success, failure, win, lose)
+- 🧩 Animated rule validation
+- 🏆 Global ranking board
+- 📱 Responsive for mobile, tablet, and desktop
+- 🌐 Deployed with Vercel
+- 🔐 Secure backend using Supabase
+
+---
+
+## 📱 Responsive Design
+
+Optimized for:
+
+- 📱 Mobile devices
+- 📲 Tablets
+- 🖥 Desktop screens
+
+The leaderboard and game rules scale cleanly across all screen sizes.
+
+---
+
+## 🛠 Tech Stack
+
+### Frontend
+- React (Vite)
+- CSS3
+- Framer Motion (animations)
+
+### Backend
+- Supabase
+  - PostgreSQL
+  - Row Level Security (RLS)
+  - Public read & insert policies
+
+### Deployment
+- Vercel
+
+---
+
