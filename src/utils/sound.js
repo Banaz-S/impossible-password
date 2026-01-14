@@ -1,9 +1,20 @@
 let successAudio;
 let breakAudio;
+let countdownAudio;
+let gameOverAudio;
+let gameWinAudio;
 
+// Optional: unlock audio after user interaction
+export const unlockAudio = () => {
+  const audio = new Audio();
+  audio.muted = true;
+  audio.play().catch(() => {});
+};
+
+// ✅ Rule success
 export const playRuleSuccessSound = () => {
   if (!successAudio) {
-    successAudio = new Audio("/src/assets/sounds/rule-success.mp3");
+    successAudio = new Audio("/sounds/rule-success.mp3");
     successAudio.volume = 0.4;
   }
 
@@ -11,9 +22,10 @@ export const playRuleSuccessSound = () => {
   successAudio.play().catch(() => {});
 };
 
+// ✅ Rule break
 export const playRuleBreakSound = () => {
   if (!breakAudio) {
-    breakAudio = new Audio("/src/assets/sounds/rule-break.mp3");
+    breakAudio = new Audio("/sounds/rule-break.mp3");
     breakAudio.volume = 0.35;
   }
 
@@ -21,11 +33,10 @@ export const playRuleBreakSound = () => {
   breakAudio.play().catch(() => {});
 };
 
-let countdownAudio;
-
+// ✅ Countdown (beep beep beep BEEEEEP)
 export const playCountdownSound = () => {
   if (!countdownAudio) {
-    countdownAudio = new Audio("/src/assets/sounds/countdown.mp3");
+    countdownAudio = new Audio("/sounds/countdown.mp3");
     countdownAudio.volume = 0.5;
   }
 
@@ -33,11 +44,10 @@ export const playCountdownSound = () => {
   countdownAudio.play().catch(() => {});
 };
 
-let gameOverAudio;
-
+// ✅ Game over
 export const playGameOverSound = () => {
   if (!gameOverAudio) {
-    gameOverAudio = new Audio("/src/assets/sounds/game-over.mp3");
+    gameOverAudio = new Audio("/sounds/game-over.mp3");
     gameOverAudio.volume = 0.5;
   }
 
@@ -45,11 +55,10 @@ export const playGameOverSound = () => {
   gameOverAudio.play().catch(() => {});
 };
 
-let gameWinAudio;
-
+// ✅ Game win
 export const playGameWinSound = () => {
   if (!gameWinAudio) {
-    gameWinAudio = new Audio("/src/assets/sounds/game-win.mp3");
+    gameWinAudio = new Audio("/sounds/game-win.mp3");
     gameWinAudio.volume = 0.6;
   }
 
