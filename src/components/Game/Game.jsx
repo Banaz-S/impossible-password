@@ -1,67 +1,84 @@
 import "./Game.css";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 
 import GameHeader from "./GameHeader/GameHeader";
 import PasswordInput from "./PasswordInput/PasswordInput";
 import RulesBoard from "./RulesBoard/RulesBoard";
 import WinScreen from "../WinScreen/WinScreen";
-import { playRuleBreakSound } from "../../utils/sound";
-import { playGameOverSound } from "../../utils/sound";
-import { playGameWinSound } from "../../utils/sound";
-// import { saveScore } from "../../utils/ranking";
-import CountdownOverlay from "./CountdownOverlay/CountdownOverlay";
 import GameOverScreen from "../GameOverScreen/GameOverScreen";
 import ExitConfirmModal from "../ExitConfirmModal/ExitConfirmModal";
-import { saveScoreToSupabase } from "../../services/rankingService";
+import CountdownOverlay from "./CountdownOverlay/CountdownOverlay";
+
+import { playRuleBreakSound } from "../../utils/sound";
+import { playGameOverSound, playGameWinSound } from "../../utils/sound";
 import { calculateFinalScore } from "../../utils/score";
-import { RULES } from "../../data/rules";
+
+import { RULE_POOLS } from "../../data/rules";
+import { pickRandomRules } from "../../utils/pickRandomRules";
+
+import { saveScoreToSupabase } from "../../services/rankingService";
 import { saveFailedAttempt } from "../../services/attemptsService";
+
+const RULE_COUNT = {
+  easy: 7,
+  medium: 10,
+  evil: 14,
+};
 
 function Game({ playerName, difficulty, onExit }) {
   // --------------------
-  // STATE
+  // BASIC STATE
   // --------------------
   const [password, setPassword] = useState("");
   const [hasWon, setHasWon] = useState(false);
-  const [score, setScore] = useState(0);
-  const breakSoundCooldownRef = useRef(false);
   const [hasLost, setHasLost] = useState(false);
+  const [score, setScore] = useState(0);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [rankingVersion, setRankingVersion] = useState(0);
 
+  const passwordInputRef = useRef(null);
+  const breakSoundCooldownRef = useRef(false);
+  const lossSavedRef = useRef(false);
+
+  // --------------------
+  // TIMER
+  // --------------------
   const getInitialTime = () => {
-    if (difficulty === "medium") return 90; // seconds
+    if (difficulty === "medium") return 90;
     if (difficulty === "evil") return 120;
-    return null; // easy = unlimited
+    return null;
   };
 
+  const [timeLeft, setTimeLeft] = useState(getInitialTime);
   const [countdownDone, setCountdownDone] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(getInitialTime());
-  const passwordInputRef = useRef(null);
 
   const formatTime = (seconds) => {
-    if (seconds === null) return "Unlimite";
+    if (seconds === null) return "∞";
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
   // --------------------
-  // RULE STATES
+  // RANDOM RULES (ONCE)
   // --------------------
-  const [ruleStates, setRuleStates] = useState(() =>
-    RULES[difficulty].map((rule) => ({
-      ...rule,
-      state: "failed", // failed | satisfied-visible | satisfied-hidden
-    }))
-  );
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
+  const initialRules = useMemo(() => {
+    return pickRandomRules(RULE_POOLS[difficulty], RULE_COUNT[difficulty]).map(
+      (rule) => ({
+        ...rule,
+        state: "failed",
+      })
+    );
+  }, []);
+
+  const [ruleStates, setRuleStates] = useState(initialRules);
 
   // --------------------
-  // TIMER FOR MEDIUM/EVIL DIFFICULTY
+  // TIMER EFFECT
   // --------------------
   useEffect(() => {
-    if (!countdownDone) return;
-    if (timeLeft === null) return; // easy mode
+    if (!countdownDone || timeLeft === null || hasWon || hasLost) return;
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
@@ -70,132 +87,74 @@ function Game({ playerName, difficulty, onExit }) {
           setHasLost(true);
           return 0;
         }
-
         return prev - 1;
       });
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [countdownDone]);
+  }, [countdownDone, hasWon, hasLost]);
 
-  //---------------------
-  // PLAY GAME OVER SOUND ON LOSS
-  //---------------------
-  useEffect(() => {
-    if (hasLost) {
-      playGameOverSound();
-      saveFailedAttempt({
-        name: playerName,
-        difficulty,
-        score,
-        timeLeft: 0,
-        reason: "time_up",
-      });
-    }
-  }, [hasLost]);
-
-  //---------------------
-  // PLAY WIN SOUND ON VICTORY
-  //---------------------
-  useEffect(() => {
-    if (!hasWon) return;
-
-    const satisfiedRules = ruleStates.filter(
-      (r) => r.state !== "failed"
-    ).length;
-
-    const finalScore = calculateFinalScore({
-      satisfiedRules,
-      difficulty,
-      timeLeft,
-    });
-
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setScore(finalScore);
-
-    playGameWinSound();
-
-    saveScoreToSupabase({
-      name: playerName,
-      difficulty,
-      score: finalScore,
-      timeLeft,
-    }).then(() => {
-      setRankingVersion((v) => v + 1);
-    });
-  }, [hasWon]);
-
-  //---------------------
-  // FOCUS PASSWORD INPUT ON GAME START
+  // --------------------
+  // PASSWORD INPUT FOCUS
   // --------------------
   useEffect(() => {
     passwordInputRef.current?.focus();
   }, []);
 
   // --------------------
-  // UPDATE RULE STATES BASED ON PASSWORD
+  // RULE VALIDATION
   // --------------------
-  useEffect(
-    () => {
-      // ⛔ Stop rule updates after game over
-      if (hasLost) return;
+  useEffect(() => {
+    if (hasWon || hasLost) return;
 
-      setRuleStates((prevRules) => {
-        const updatedRules = prevRules.map((rule) => {
-          const isValid = rule.validate(password);
+    setRuleStates((prevRules) => {
+      const updated = prevRules.map((rule) => {
+        const valid = rule.validate(password);
 
-          if (isValid && rule.state === "failed") {
-            return { ...rule, state: "satisfied-visible" };
-          }
-
-          if (!isValid && rule.state !== "failed") {
-            return { ...rule, state: "failed" };
-          }
-
-          return rule;
-        });
-
-        // 🔊 debounced break sound
-        if (!breakSoundCooldownRef.current) {
-          const hasBrokenRule = prevRules.some((prevRule, index) => {
-            const nextRule = updatedRules[index];
-            return prevRule.state !== "failed" && nextRule.state === "failed";
-          });
-
-          if (hasBrokenRule) {
-            playRuleBreakSound();
-            breakSoundCooldownRef.current = true;
-
-            setTimeout(() => {
-              breakSoundCooldownRef.current = false;
-            }, 300);
-          }
+        if (valid && rule.state === "failed") {
+          return { ...rule, state: "satisfied-visible" };
         }
 
-        return updatedRules;
+        if (!valid && rule.state !== "failed") {
+          return { ...rule, state: "failed" };
+        }
+
+        return rule;
       });
-    },
-    [password],
-    hasLost
-  );
+
+      if (!breakSoundCooldownRef.current) {
+        const broken = prevRules.some(
+          (r, i) => r.state !== "failed" && updated[i].state === "failed"
+        );
+
+        if (broken) {
+          playRuleBreakSound();
+          breakSoundCooldownRef.current = true;
+          setTimeout(() => (breakSoundCooldownRef.current = false), 300);
+        }
+      }
+
+      return updated;
+    });
+  }, [password]);
 
   // --------------------
-  // HIDE RULE AFTER ANIMATION DELAY
+  // HIDE SATISFIED RULES
   // --------------------
   useEffect(() => {
     const timers = [];
 
     ruleStates.forEach((rule) => {
       if (rule.state === "satisfied-visible") {
-        const timer = setTimeout(() => {
-          setRuleStates((prev) =>
-            prev.map((r) =>
-              r.id === rule.id ? { ...r, state: "satisfied-hidden" } : r
-            )
-          );
-        }, 1000); // visible for 1 second
-
-        timers.push(timer);
+        timers.push(
+          setTimeout(() => {
+            setRuleStates((prev) =>
+              prev.map((r) =>
+                r.id === rule.id ? { ...r, state: "satisfied-hidden" } : r
+              )
+            );
+          }, 1000)
+        );
       }
     });
 
@@ -203,19 +162,21 @@ function Game({ playerName, difficulty, onExit }) {
   }, [ruleStates]);
 
   // --------------------
-  // SCORE & WIN CONDITION
+  // SCORE + WIN CHECK
   // --------------------
   useEffect(() => {
-    const satisfiedCount = ruleStates.filter(
-      (r) => r.state !== "failed"
-    ).length;
+    if (hasWon || hasLost) return;
 
-    let multiplier = 1;
-    if (difficulty === "medium") multiplier = 1.5;
-    if (difficulty === "evil") multiplier = 2;
+    const satisfied = ruleStates.filter((r) => r.state !== "failed").length;
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setScore(Math.floor(satisfiedCount * 10 * multiplier));
+    setScore(
+      Math.floor(
+        satisfied *
+          10 *
+          (difficulty === "medium" ? 1.5 : difficulty === "evil" ? 2 : 1)
+      )
+    );
 
     if (
       ruleStates.length > 0 &&
@@ -225,9 +186,52 @@ function Game({ playerName, difficulty, onExit }) {
     }
   }, [ruleStates, difficulty]);
 
-  //---------------------
-  // GAME OVER SCREEN
-  //---------------------
+  // --------------------
+  // WIN HANDLER
+  // --------------------
+  useEffect(() => {
+    if (!hasWon) return;
+
+    const satisfied = ruleStates.length;
+    const finalScore = calculateFinalScore({
+      satisfiedRules: satisfied,
+      difficulty,
+      timeLeft,
+    });
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setScore(finalScore);
+    playGameWinSound();
+
+    saveScoreToSupabase({
+      name: playerName,
+      difficulty,
+      score: finalScore,
+      timeLeft,
+    }).then(() => setRankingVersion((v) => v + 1));
+  }, [hasWon]);
+
+  // --------------------
+  // LOSS HANDLER
+  // --------------------
+  useEffect(() => {
+    if (!hasLost || lossSavedRef.current) return;
+
+    lossSavedRef.current = true;
+    playGameOverSound();
+
+    saveFailedAttempt({
+      name: playerName,
+      difficulty,
+      score,
+      timeLeft,
+      reason: "time_up",
+    });
+  }, [hasLost]);
+
+  // --------------------
+  // SCREENS
+  // --------------------
   if (hasLost) {
     return (
       <GameOverScreen
@@ -238,9 +242,6 @@ function Game({ playerName, difficulty, onExit }) {
     );
   }
 
-  // --------------------
-  // WIN SCREEN
-  // --------------------
   if (hasWon) {
     return (
       <WinScreen
@@ -271,14 +272,11 @@ function Game({ playerName, difficulty, onExit }) {
           !countdownDone || showExitConfirm ? "game-locked" : ""
         }`}
       >
-        {/* 🔒 Countdown overlay — MUST BE FIRST */}
         {!countdownDone && (
           <CountdownOverlay
             onFinish={() => {
               setCountdownDone(true);
-              setTimeout(() => {
-                passwordInputRef.current?.focus();
-              }, 100);
+              setTimeout(() => passwordInputRef.current?.focus(), 100);
             }}
           />
         )}
@@ -294,7 +292,7 @@ function Game({ playerName, difficulty, onExit }) {
           ref={passwordInputRef}
           password={password}
           setPassword={setPassword}
-          disabled={!countdownDone || hasLost}
+          disabled={!countdownDone}
         />
 
         <RulesBoard rules={ruleStates} />

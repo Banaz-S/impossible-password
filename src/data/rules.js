@@ -23,7 +23,7 @@ const WEEKDAYS = [
 const EMOJI_REGEX = /[\u{1F300}-\u{1FAFF}]/u;
 const EMOJI_REGEX_GLOBAL = /[\u{1F300}-\u{1FAFF}]/gu;
 
-export const RULES = {
+export const RULE_POOLS = {
   easy: [
     {
       id: "len_8_20",
@@ -59,6 +59,44 @@ export const RULES = {
       id: "start_letter",
       text: "Must start with a letter",
       validate: (pw) => /^[A-Za-z]/.test(pw),
+    },
+    {
+      id: "ends_letter",
+      text: "Must end with a letter",
+      validate: (pw) => /[A-Za-z]$/.test(pw),
+    },
+    {
+      id: "min_two_letters",
+      text: "Must include at least 2 letters",
+      validate: (pw) => (pw.match(/[A-Za-z]/g) || []).length >= 2,
+    },
+    {
+      id: "no_spaces",
+      text: "Must not include spaces",
+      validate: (pw) => !/\s/.test(pw),
+    },
+    {
+      id: "lowercase",
+      text: "Must include at least one lowercase letter",
+      validate: (pw) => /[a-z]/.test(pw),
+    },
+    {
+      id: "two_colors",
+      text: "Must include two different color names",
+      validate: (pw) => {
+        const found = COLORS.filter((c) => pw.toLowerCase().includes(c));
+        return new Set(found).size >= 2;
+      },
+    },
+    {
+      id: "digit_not_start",
+      text: "Must not start with a number",
+      validate: (pw) => !/^\d/.test(pw),
+    },
+    {
+      id: "no_symbols",
+      text: "Must not include symbols",
+      validate: (pw) => !/[^A-Za-z0-9 ]/.test(pw),
     },
   ],
 
@@ -119,6 +157,67 @@ export const RULES = {
       id: "color",
       text: "Must include a color name",
       validate: (pw) => COLORS.some((c) => pw.toLowerCase().includes(c)),
+    },
+    {
+      id: "odd_consonants",
+      text: "Number of consonants must be odd",
+      validate: (pw) => {
+        const c = (pw.match(/[bcdfghjklmnpqrstvwxyz]/gi) || []).length;
+        return c % 2 === 1;
+      },
+    },
+    {
+      id: "emoji_not_adjacent_to_digit",
+      text: "Emoji must not be next to a number",
+      validate: (pw) =>
+        !/(\d\p{Extended_Pictographic}|\p{Extended_Pictographic}\d)/u.test(pw),
+    },
+    {
+      id: "starts_upper",
+      text: "Must start with an uppercase letter",
+      validate: (pw) => /^[A-Z]/.test(pw),
+    },
+    {
+      id: "two_specials",
+      text: "Must include exactly 2 special characters",
+      validate: (pw) => (pw.match(/[^A-Za-z0-9 ]/g) || []).length === 2,
+    },
+    {
+      id: "emoji_not_end",
+      text: "Emoji must not be at the end",
+      validate: (pw) => !EMOJI_REGEX.test(pw.slice(-2)),
+    },
+    {
+      id: "vowels_gt_3",
+      text: "Must include more than 3 vowels",
+      validate: (pw) => (pw.match(/[aeiou]/gi) || []).length > 3,
+    },
+    {
+      id: "color_length_gt_4",
+      text: "Color name must be longer than 4 letters",
+      validate: (pw) =>
+        COLORS.some((c) => c.length > 4 && pw.toLowerCase().includes(c)),
+    },
+    {
+      id: "digit_before_year",
+      text: "A number must appear before the year",
+      validate: (pw) => /\d.*(200\d|201\d|202[0-6])/.test(pw),
+    },
+    {
+      id: "no_repeated_digits",
+      text: "Digits must not repeat",
+      validate: (pw) => {
+        const nums = pw.match(/\d/g) || [];
+        return new Set(nums).size === nums.length;
+      },
+    },
+    {
+      id: "weekday_not_at_end",
+      text: "Weekday must not be the last word",
+      validate: (pw) =>
+        WEEKDAYS.some(
+          (d) => pw.toLowerCase().includes(d) && !pw.toLowerCase().endsWith(d)
+        ),
     },
   ],
 
@@ -196,6 +295,70 @@ export const RULES = {
       id: "win",
       text: "Must include the word 'win' (case-insensitive)",
       validate: (pw) => pw.toLowerCase().includes("win"),
+    },
+    {
+      id: "no_duplicate_digits",
+      text: "Numbers must not repeat",
+      validate: (pw) => {
+        const nums = pw.match(/\d/g) || [];
+        return new Set(nums).size === nums.length;
+      },
+    },
+    {
+      id: "emoji_separated",
+      text: "Emojis must not be adjacent",
+      validate: (pw) => !/(\p{Extended_Pictographic})\1/gu.test(pw),
+    },
+    {
+      id: "digit_sum_even",
+      text: "Sum of all digits must be even",
+      validate: (pw) => {
+        const nums = pw.match(/\d/g) || [];
+        return nums.reduce((a, n) => a + Number(n), 0) % 2 === 0;
+      },
+    },
+    {
+      id: "weekday_after_color",
+      text: "Weekday must appear after the color",
+      validate: (pw) =>
+        COLORS.some((c) =>
+          WEEKDAYS.some(
+            (d) => pw.toLowerCase().indexOf(d) > pw.toLowerCase().indexOf(c)
+          )
+        ),
+    },
+    {
+      id: "prime_number",
+      text: "Must include a prime number (2,3,5,7)",
+      validate: (pw) => /[2357]/.test(pw),
+    },
+    {
+      id: "uppercase_not_start",
+      text: "Uppercase letter must not be at the start",
+      validate: (pw) => /^[a-z]/.test(pw),
+    },
+    {
+      id: "emoji_between_letters",
+      text: "Emoji must be between two letters",
+      validate: (pw) => /[A-Za-z]\p{Extended_Pictographic}[A-Za-z]/u.test(pw),
+    },
+    {
+      id: "color_before_weekday",
+      text: "Color must appear before weekday",
+      validate: (pw) =>
+        COLORS.some((c) =>
+          WEEKDAYS.some(
+            (d) => pw.toLowerCase().indexOf(c) < pw.toLowerCase().indexOf(d)
+          )
+        ),
+    },
+    {
+      id: "no_repeated_words",
+      text: "Words must not repeat",
+      validate: (pw) => {
+        const words = pw.toLowerCase().match(/[a-z]+/g) || [];
+        return new Set(words).size === words.length;
+      },
     },
   ],
 };
