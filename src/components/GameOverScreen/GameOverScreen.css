@@ -2,7 +2,7 @@
   position: fixed;
   inset: 0;
   background: radial-gradient(circle, #1a0000, #000);
-  color: #ff4d4d;
+  color: white;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -11,7 +11,13 @@
   z-index: 2000;
   font-family: "Press Start 2P", cursive;
 }
-
+.game-over-screen h1 {
+  color: #ff4d4d;
+  text-shadow: 0 0 10px #ff4d4d;
+}
+.game-over-screen p {
+  color: #ff4d4d;
+}
 .game-over-screen button {
   padding: 12px 20px;
   background: #ff4d4d;
@@ -19,4 +25,5 @@
   color: black;
   font-weight: bold;
   cursor: pointer;
+  border-radius: 5px;
 }
