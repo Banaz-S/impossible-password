@@ -26,3 +26,9 @@
   cursor: pointer;
   border-radius: 5px;
 }
+
+@media (max-width: 768px) {
+  .game-over-screen {
+    font-size: 14px;
+  }
+}
