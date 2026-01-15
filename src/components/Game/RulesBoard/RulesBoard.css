@@ -44,7 +44,10 @@
 
 /* Mobile */
 @media (max-width: 768px) {
-  .rules-board {
-    gap: 8px;
+  .rules-list {
+    width: 90%;
+  }
+  .rule-item {
+    font-size: 15px;
   }
 }
