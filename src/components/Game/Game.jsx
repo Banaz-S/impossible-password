@@ -74,6 +74,25 @@ function Game({ playerName, difficulty, onExit }) {
 
   const [ruleStates, setRuleStates] = useState(initialRules);
 
+  const attemptSavedRef = useRef(false);
+
+  const saveExitAttempt = async () => {
+    if (attemptSavedRef.current) return;
+    attemptSavedRef.current = true;
+
+    try {
+      await saveFailedAttempt({
+        name: playerName,
+        difficulty,
+        score,
+        timeLeft: timeLeft ?? null,
+        reason: "exit",
+      });
+    } catch (e) {
+      console.error("Failed saving exit attempt:", e);
+    }
+  };
+
   // --------------------
   // TIMER EFFECT
   // --------------------
@@ -229,6 +248,16 @@ function Game({ playerName, difficulty, onExit }) {
     });
   }, [hasLost]);
 
+  useEffect(() => {
+    const handler = () => {
+      // best-effort
+      saveExitAttempt();
+    };
+
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, []);
+
   // --------------------
   // SCREENS
   // --------------------
@@ -262,7 +291,10 @@ function Game({ playerName, difficulty, onExit }) {
     <>
       {showExitConfirm && (
         <ExitConfirmModal
-          onConfirm={onExit}
+          onConfirm={async () => {
+            await saveExitAttempt();
+            onExit();
+          }}
           onCancel={() => setShowExitConfirm(false)}
         />
       )}
