@@ -42,7 +42,7 @@ export const RULE_POOLS = {
     },
     {
       id: "year",
-      text: "Must include a 4-digit year (2000–2026)",
+      text: "Must include a 4-digit year (2000-2026)",
       validate: (pw) => /(200\d|201\d|202[0-6])/.test(pw),
     },
     {
@@ -71,11 +71,6 @@ export const RULE_POOLS = {
       validate: (pw) => (pw.match(/[A-Za-z]/g) || []).length >= 2,
     },
     {
-      id: "no_spaces",
-      text: "Must not include spaces",
-      validate: (pw) => !/\s/.test(pw),
-    },
-    {
       id: "lowercase",
       text: "Must include at least one lowercase letter",
       validate: (pw) => /[a-z]/.test(pw),
@@ -88,22 +83,12 @@ export const RULE_POOLS = {
         return new Set(found).size >= 2;
       },
     },
-    {
-      id: "digit_not_start",
-      text: "Must not start with a number",
-      validate: (pw) => !/^\d/.test(pw),
-    },
-    {
-      id: "no_symbols",
-      text: "Must not include symbols",
-      validate: (pw) => !/[^A-Za-z0-9 ]/.test(pw),
-    },
   ],
 
   medium: [
     {
       id: "len_12_20",
-      text: "Password length must be 12–20 characters",
+      text: "Password length must be 12-20 characters",
       validate: (pw) => pw.length >= 12 && pw.length <= 20,
     },
     {
